@@ -46,7 +46,7 @@
             const container = document.getElementById('data-container');
             const categories = {};
             // Define the order in which keys should be displayed
-            const keysOrder = ["id", "original annotate","RAG","characters","per_characters_summarized_plot","text_items","gt wiki","per_characters_summarized_plot find wiki"];
+            const keysOrder = ["id", "original annotate","RAG","characters","per_characters_summarized_plot","text_items","gt wiki","original_annotate find wiki","per_characters_summarized_plot find wiki"];
             // Decide which keys go above the divider
             const keysAboveDivider = ["id", "original annotate"];
 
@@ -96,7 +96,7 @@
         function formatItemContent(key, item) {
             // let displayKey = key === 'text' ? 'final key' : key;
 
-            if (key === "gt wiki" || key === "per_characters_summarized_plot find wiki") {
+            if (key === "gt wiki" || key === "per_characters_summarized_plot find wiki" || key === "original_annotate find wiki") {
                 let evidenceContent = `<strong>${key}:</strong><br>`;
                 item[key].forEach((evidence, index) => {
                     evidenceContent += `<div><u>Items ${index+1}:</u><br>`;
