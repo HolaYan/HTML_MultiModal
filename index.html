@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Data Viewer</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .section {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            width: 45%;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #004d99;
+        }
+        .dict-entry {
+            margin-bottom: 20px;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background-color: #f1f1f1;
+        }
+        .divider {
+            border-top: 2px solid #007bff;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>FM2 JSON Data</h1>
+    <div id="data-container" class="container">
+        <!-- Dynamic data will be inserted here -->
+    </div>
+
+    <script>
+        // Fetching the JSON data
+        fetch('added_path.chapters_5_processed.2.json')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('data-container');
+            const categories = {};
+            // Define the order in which keys should be displayed
+            const keysOrder = ["id", "original annotate","RAG","characters","per_characters_summarized_plot","text_items","gt wiki","per_characters_summarized_plot find wiki"];
+            // Decide which keys go above the divider
+            const keysAboveDivider = ["id", "original annotate"];
+
+            // Organizing data by category
+            data.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+
+            // Displaying the categorized data
+            for (let category in categories) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                section.innerHTML = `<h2>${category}</h2>`;
+
+                categories[category].forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'dict-entry';
+                    let itemContent = '';
+                    // Display keys above the divider
+                    keysOrder.forEach(key => {
+                        if (keysAboveDivider.includes(key) && key in item) {
+                            itemContent += formatItemContent(key, item);
+                        }
+                    });
+                    
+                    // Insert the divider here
+                    itemContent += `<div class="divider"></div>`;
+                    
+                    // Display keys below the divider
+                    keysOrder.forEach(key => {
+                        if (!keysAboveDivider.includes(key) && key in item) {
+                            itemContent += formatItemContent(key, item);
+                        }
+                    });
+
+                    itemElement.innerHTML = itemContent;
+                    section.appendChild(itemElement);
+                });
+                container.appendChild(section);
+            }
+        })
+        .catch(error => console.error('Error fetching JSON data:', error));
+
+        function formatItemContent(key, item) {
+            // let displayKey = key === 'text' ? 'final key' : key;
+
+            if (key === "gt wiki" || key === "per_characters_summarized_plot find wiki") {
+                let evidenceContent = `<strong>${key}:</strong><br>`;
+                item[key].forEach((evidence, index) => {
+                    evidenceContent += `<div><u>Items ${index+1}:</u><br>`;
+                    for (let evidKey in evidence) {
+                        evidenceContent += `${evidKey}: ${evidence[evidKey]}<br>`;
+                    }
+                    evidenceContent += '</div>';
+                });
+                return evidenceContent;
+            } else {
+                return `<strong>${key}:</strong> <br> ${Array.isArray(item[key]) ? JSON.stringify(item[key]) : item[key]}<br>`;
+            }
+        }
+    </script>
+</body>
+</html>
